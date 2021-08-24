@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('设备修改')"/>
+</head>
+<body>
+<form class="layui-form" action=""  th:object="${sysDevice}">
+    <div class="mainBox">
+        <div class="main-container">
+            <div class="main-container">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">设备ID</label>
+                    <div class="layui-input-block">
+                        <input type="text" th:value="*{deviceID}" name="deviceID"
+                              readonly class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">设备名称</label>
+                    <div class="layui-input-block">
+                        <input th:value="*{deviceName}" type="text" name="deviceName" autocomplete="off" placeholder="设备名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">部门</label>
+                    <div class="layui-input-block">
+                        <ul id="selectParent" name="deptId" class="dtree" data-id="0"></ul>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">信号时长</label>
+                    <div class="layui-input-block">
+                        <input th:value="*{openTime}" type="text" name="openTime" autocomplete="off" placeholder="openTime" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="layui-btn layui-btn-normal layui-btn-sm" lay-submit=""
+                    lay-filter="device-update">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<th:block th:include="include :: footer"/>
+<script>
+	$(document).ready(function(){
+		 $("#aiMode option[value='[[${sysDevice.aiMode}]]']").attr("selected", true); 
+	});
+	
+    layui.use(['form', 'jquery','dtree'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let MODULE_PATH = rootPath+"/SysDeviceController";
+        
+        let dtree = layui.dtree;
+        let DEPAR_PATH=rootPath+"/SysDepartmentController";
+        //部门树
+        dtree.renderSelect({
+            elem: "#selectParent",
+            url: DEPAR_PATH+"/tree",
+            method: 'get',
+            selectInputName: {nodeId: "depId"},
+            skin: "layui",
+            dataFormat: "list",
+            response: {treeId: "id", parentId: "parentId", title: "deptName"},
+            selectInitVal: "[[${sysDevice.depId}]]"
+        });
+        
+        form.on('submit(device-update)', function (data) {
+            $.ajax({
+                url: MODULE_PATH+'/edit',
+                data: data.field,
+                dataType: 'json',
+                contentType: 'application/x-www-form-urlencoded',
+                type: 'post',
+                success: function (result) {
+                    if (result.code==200) {
+                        layer.msg(result.msg, {icon: 1, time: 1000}, function () {
+                            parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                            parent.layui.table.reload("device-table");
+                        });
+                    } else {
+                        layer.msg(result.msg, {icon: 2, time: 1000});
+                    }
+                }
+            })
+            return false;
+        });
+    })
+</script>
+</body>
+</html>

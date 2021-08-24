@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('人脸特征修改')"/>
+</head>
+<body>
+<form class="layui-form" action=""  th:object="${SysFace}">
+    <div class="mainBox">
+        <div class="main-container">
+            <div class="main-container">
+				<div class="layui-form-item layui-hide">
+                    <label class="layui-form-label">主键</label>
+                    <div class="layui-input-block">
+                        <input type="text" th:value="*{id}" name="id" lay-verify="title"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+				<div class="layui-form-item">
+                    <label class="layui-form-label">所属部门</label>
+                    <div class="layui-input-block">
+                        <ul id="selectParent" name="departmentId" class="dtree" data-id="0"></ul>
+                    </div>
+                </div>
+
+				<div class="layui-form-item">
+                    <label class="layui-form-label">姓名</label>
+                    <div class="layui-input-block">
+                        <input th:value="*{name}" type="text" name="name" autocomplete="off" placeholder="姓名" class="layui-input">
+                    </div>
+                </div>
+
+				<div class="layui-form-item">
+                    <label class="layui-form-label">工号</label>
+                    <div class="layui-input-block">
+                        <input th:value="*{number}" type="text" name="number" autocomplete="off" placeholder="工号" class="layui-input">
+                    </div>
+                </div>
+
+				<div class="layui-form-item">
+                    <label class="layui-form-label">人脸特征</label>
+                    <div class="layui-upload">
+					  <button type="button" class="layui-btn" id="upload_face">上传图片</button>
+					</div> 
+                </div>
+                <div class="layui-form-item">
+                	<label class="layui-form-label"></label>
+                    <div class="layui-upload-list">
+					    <img class="layui-upload-img" id="eigenImg" style="width:300px;" th:src="*{eigen}">
+					    <input type="hidden" name="eigen" id="eigenHidden" th:value="*{eigen}"/>
+					    <input type="hidden" name="base64" id="base64Hidden" th:value="*{base64}"/>
+					</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="layui-btn layui-btn-normal layui-btn-sm" lay-submit=""
+                    lay-filter="sysFace-update">
+                <i class="layui-icon layui-icon-ok"></i>
+				提交
+            </button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+				重置
+            </button>
+        </div>
+    </div>
+</form>
+<th:block th:include="include :: footer"/>
+<script>
+    layui.use(['upload', 'element', 'form','jquery','dtree'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let MODULE_PATH = rootPath+"/SysFaceController";
+        let upload = layui.upload;
+		let element = layui.element;
+		let dtree = layui.dtree;
+		let DEPAR_PATH=rootPath+"/SysDepartmentController";
+        
+        //部门树
+        dtree.renderSelect({
+            elem: "#selectParent",
+            url: DEPAR_PATH+"/tree",
+            method: 'get',
+            selectInputName: {nodeId: "depId"},
+            skin: "layui",
+            dataFormat: "list",
+            response: {treeId: "id", parentId: "parentId", title: "deptName"},
+            selectInitVal: "[[${SysFace.departmentId}]]"
+        });
+        
+        //常规使用 - 普通图片上传
+		upload.render({
+		    elem: '#upload_face'
+		    ,url: MODULE_PATH+'/uploadFaceImage' //改成您自己的上传接口
+		    ,before: function(obj){
+		      //预读本地文件示例，不支持ie8
+		      obj.preview(function(index, file, result){
+		        $('#eigenImg').attr('src', result); //图片链接（base64）
+		      });
+		      
+		      layer.msg('上传中', {icon: 16, time: 0});
+		    }
+		    ,done: function(res){
+		      $('.layui-layer-dialog').remove();
+		      //如果上传失败
+		      if(res.code < 0){
+		        return layer.msg(res.data);
+		      }
+		      
+		      $('#eigenHidden').val($('#eigenImg').attr('src'));
+		      $('#base64Hidden').val(res.data);
+		    }
+		    ,error: function(){
+		    }
+		  });
+		  
+        form.on('submit(sysFace-update)', function (data) {
+            $.ajax({
+                url: MODULE_PATH+'/edit',
+                data: data.field,
+                dataType: 'json',
+                contentType: 'application/x-www-form-urlencoded',
+                type: 'post',
+                success: function (result) {
+                    if (result.code==200) {
+                        layer.msg(result.msg, {icon: 1, time: 1000}, function () {
+                            parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                            parent.layui.table.reload("sysFace-table");
+                        });
+                    } else {
+                        layer.msg(result.msg, {icon: 2, time: 1000});
+                    }
+                }
+            })
+            return false;
+        });
+    })
+</script>
+<script>
+</script>
+</body>
+</html>

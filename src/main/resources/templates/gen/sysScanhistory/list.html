@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('扫描记录列表')"/>
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">姓名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" placeholder="请输入姓名" class="layui-input">
+                </div>
+                <label class="layui-form-label">部门</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="departmentName" placeholder="请输入部门" class="layui-input">
+                </div>
+                <button class="pear-btn pear-btn-md pear-btn-primary" style="margin-left: 100px;" lay-submit lay-filter="sysScanhistory-query">
+                    <i class="layui-icon layui-icon-search"></i>
+                   	 查询
+                </button>
+                <button type="reset" class="pear-btn pear-btn-md">
+                    <i class="layui-icon layui-icon-refresh"></i>
+					重置
+                </button>
+            </div>
+            <div class="layui-form-item">   
+                <label class="layui-form-label">设备名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="deviceName" placeholder="请输入设备名称" class="layui-input">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table id="sysScanhistory-table" lay-filter="sysScanhistory-table"></table>
+    </div>
+</div>
+</body>
+
+<th:block th:include="include :: footer"/>
+<script>
+    layui.use(['table', 'form', 'jquery'], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let $ = layui.jquery;
+
+        let MODULE_PATH = rootPath+"/SysScanhistoryController/";
+        let cols = [
+            [
+                {type: 'checkbox'},
+				{title: '姓名', field: 'name', align: 'center'},
+				{title: '部门名称', field: 'departmentName', align: 'center'},
+				{title: '工号', field: 'number', align: 'center'},
+				{title: '设备名称', field: 'deviceName', align: 'center'},
+				{title: '扫描时间', field: 'scanTime', align: 'center'}
+            ]
+        ]
+
+        //table表单列表
+        table.render({
+            elem: '#sysScanhistory-table',
+            url: MODULE_PATH + 'list',
+            page: true,
+            method: 'get',
+            cols: cols,
+            skin: 'line',
+            defaultToolbar: []
+        });
+
+        //查询按钮绑定
+        form.on('submit(sysScanhistory-query)', function (data) {
+            table.reload('sysScanhistory-table', {where: data.field})
+            return false;
+        });
+    })
+</script>
+</html>

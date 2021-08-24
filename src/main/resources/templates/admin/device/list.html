@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('设备列表')"/>
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">设备ID</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="deviceID" placeholder="请输入设备ID" class="layui-input">
+                </div>
+                <label class="layui-form-label">设备名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="deviceName" placeholder="请输入设备名称" class="layui-input">
+                </div>
+                <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="device-query">
+                    <i class="layui-icon layui-icon-search"></i>
+                    查询
+                </button>
+                <button type="reset" class="pear-btn pear-btn-md">
+                    <i class="layui-icon layui-icon-refresh"></i>
+                    重置
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table id="device-table" lay-filter="device-table"></table>
+        <input type="hidden" id="selectDevices"/>
+    </div>
+</div>
+
+<script type="text/html" id="device-toolbar">
+	<button shiro:hasPermission="gen:sysDevice:edit" class="pear-btn pear-btn-primary pear-btn-sm" lay-event="assign"><i class="layui-icon layui-icon-transfer">分配部门</i>
+    </button>
+</script>
+
+<script type="text/html" id="device-bar">
+    <button shiro:hasPermission="gen:sysDevice:edit" class="pear-btn pear-btn-danger pear-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>
+    </button>
+    <button shiro:hasPermission="gen:sysDevice:edit" class="pear-btn pear-btn-success pear-btn-sm" lay-event="upload-face"><i class="layui-icon layui-icon-upload"></i>
+    </button>
+    <button shiro:hasPermission="gen:sysDevice:edit" class="pear-btn pear-btn-warming pear-btn-sm" lay-event="download-record"><i class="layui-icon layui-icon-download-circle"></i>
+    </button>
+</script>
+
+<script type="text/html" id="active-enable">
+    <input type="checkbox" name="enable" value="{{d.deviceID}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="active-enable" {{d.activeStatus== '1' ? 'checked' : '' }} >
+</script>
+</body>
+<th:block th:include="include :: footer"/>
+<script>
+    layui.use(['table', 'form', 'jquery'], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let $ = layui.jquery;
+
+        let MODULE_PATH = rootPath+"/SysDeviceController/";
+		let cols = [
+			[
+		        {type: 'checkbox'},
+		        {field: 'deviceID', width: 140, title: '设备ID'},
+		        {field: 'deviceName', width: 150, title: '设备名称'},
+		        {field: 'departmentName', title: '所属部门'},
+		        {field: 'openTime', title: '信号时长'},
+		        {title: '活体检测', field: 'activeStatus',  width: 100, templet: '#active-enable'},
+		        {field: 'featureCount', title: '特征数'},
+		        {field: 'recordCount', width: 100, title: '识别记录数'},
+		        {title: '操作', templet: '#device-bar', width: 180, align: 'center'}
+		    ]
+        ];
+        
+        form.on('switch(active-enable)', function (obj) {
+            let operate;
+
+            if (obj.elem.checked) {
+                operate = 1;
+            } else {
+                operate = 0;
+            }
+
+            let loading = layer.load()
+
+            $.ajax({
+                url: MODULE_PATH+'updateActiveStatus',
+                data: JSON.stringify({deviceID: this.value, activeStatus:operate}),
+                dataType: 'json',
+                contentType: 'application/json',
+                type: 'put',
+                success: function (result) {
+                    layer.close(loading);
+                    if (result.code==200) {
+                        layer.msg(result.msg, {icon: 1, time: 1000}, function () {
+                        });
+                    } else {
+                        layer.msg(result.msg, {icon: 2, time: 1000});
+                    }
+                }
+            })
+        });
+
+        table.render({
+            skin: 'line',
+            method: 'get',
+            treeDefaultClose: true,
+            toolbar: '#device-toolbar',
+            elem: '#device-table',
+            url: MODULE_PATH+'list',
+            page: true,
+            cols: cols,
+            defaultToolbar: [],
+            done:function(res, curr, count){  //res 接口返回的信息
+			}
+        });
+
+        form.on('submit(device-query)', function (data) {
+            table.reload('device-table', {where: data.field});
+            return false;
+        });
+
+        table.on('toolbar(device-table)', function (obj) {
+            if (obj.event === 'assign') {
+            	window.assign(obj);
+            }
+        })
+        
+        table.on('tool(device-table)', function (obj) {
+            if (obj.event === 'upload-face') {
+                window.uploadFace(obj);
+            } else if (obj.event === 'edit') {
+                window.edit(obj);
+            } else if (obj.event === 'download-record') {
+                window.downloadRecord(obj);
+            }
+        })
+
+        window.edit = function (obj) {
+            layer.open({
+                type: 2,
+                title: '修改',
+                shade: 0.1,
+                area: ['450px', '500px'],
+                content: MODULE_PATH + 'edit/' + obj.data['deviceID']
+            });
+        }
+
+        window.uploadFace = function (obj) {
+        	let loading = layer.load();
+            $.ajax({
+                url: MODULE_PATH + "uploadFace?deviceID=" + obj.data['deviceID'],
+                dataType: 'json',
+                success: function (result) {
+                    layer.close(loading);
+                    if (result.code==200) {
+                        layer.msg(result.msg, {icon: 1, time: 1000}, function () {
+                            table.reload('device-table', {where: obj.data.field});
+                        });
+                    } else {
+                        layer.msg(result.msg, {icon: 2, time: 1000});
+                    }
+                }
+            })
+        }
+        
+        window.downloadRecord = function (obj) {
+        	let loading = layer.load();
+            $.ajax({
+                url: MODULE_PATH + "downloadRecord?deviceID=" + obj.data['deviceID'],
+                dataType: 'json',
+                success: function (result) {
+                    layer.close(loading);
+                    if (result.code==200) {
+                        layer.msg(result.msg, {icon: 1, time: 1000}, function () {
+                            table.reload('device-table', {where: obj.data.field});
+                        });
+                    } else {
+                        layer.msg(result.msg, {icon: 2, time: 1000});
+                    }
+                }
+            })
+        }
+        
+        window.assign = function (obj) {
+        	let data = table.checkStatus(obj.config.id).data;
+            if (data.length === 0) {
+                layer.msg("未选中数据", {icon: 3, time: 1000});
+                return false;
+            }
+            let ids = "";
+            for (let i = 0; i < data.length; i++) {
+                ids += data[i].deviceID + ",";
+            }
+            ids = ids.substr(0, ids.length - 1);
+            $('#selectDevices').val(ids);
+            layer.open({
+                type: 2,
+                title: '部门设定',
+                shade: 0.1,
+                area: ['350px', '300px'],
+                content: MODULE_PATH + 'assign'
+            });
+        }
+    })
+</script>
+</html>

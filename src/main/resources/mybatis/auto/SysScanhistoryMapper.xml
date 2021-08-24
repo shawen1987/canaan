@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springboot.core.mapper.auto.SysScanhistoryMapper">
+  <resultMap id="BaseResultMap" type="com.springboot.core.model.auto.SysScanhistory">
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="face_id" jdbcType="INTEGER" property="faceId" />
+    <result column="department_id" jdbcType="INTEGER" property="departmentId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="number" jdbcType="VARCHAR" property="number" />
+    <result column="device_id" jdbcType="VARCHAR" property="deviceId" />
+    <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+    <result column="department_name" jdbcType="VARCHAR" property="departmentName" />
+    <result column="scan_time" jdbcType="TIMESTAMP" property="scanTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+  
+	  	  	      	id,
+       	  	      	face_id,
+       	  	      	department_id,
+       	  	      	name,
+       	  	      	number,
+       	  	      	device_id,
+       	  	      	device_name,
+       	  	      	department_name,
+       	  	    	  	scan_time
+       	  	
+  </sql>
+  
+  <select id="selectByExample" parameterType="com.springboot.core.model.auto.SysScanhistoryExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_sys_scanhistory
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_sys_scanhistory
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_sys_scanhistory
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.springboot.core.model.auto.SysScanhistoryExample">
+    delete from t_sys_scanhistory
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <insert id="insert" parameterType="com.springboot.core.model.auto.SysScanhistory">
+    insert into t_sys_scanhistory (
+      	  	       id,
+       	  	       face_id,
+       	  	       department_id,
+       	  	       name,
+       	  	       number,
+       	  	       device_id,
+       	  	       device_name,
+       	  	       department_name,
+       	  	    	  scan_time
+       	    )
+    values (
+	  	  	      	#{id,jdbcType=INTEGER},
+       	  	      	#{faceId,jdbcType=INTEGER},
+       	  	      	#{departmentId,jdbcType=INTEGER},
+       	  	      	#{name,jdbcType=VARCHAR},
+       	  	      	#{number,jdbcType=VARCHAR},
+       	  	      	#{deviceId,jdbcType=VARCHAR},
+       	  	      	#{deviceName,jdbcType=VARCHAR},
+       	  	      	#{departmentName,jdbcType=VARCHAR},
+       	  	    	  #{scanTime,jdbcType=TIMESTAMP}
+       	    )
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.springboot.core.model.auto.SysScanhistory">
+    insert into t_sys_scanhistory
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+          
+      <if test="id != null">
+        id,
+      </if>
+         
+      <if test="faceId != null">
+        face_id,
+      </if>
+         
+      <if test="departmentId != null">
+        department_id,
+      </if>
+         
+      <if test="name != null">
+        name,
+      </if>
+         
+      <if test="number != null">
+        number,
+      </if>
+         
+      <if test="deviceId != null">
+        device_id,
+      </if>
+         
+      <if test="deviceName != null">
+        device_name,
+      </if>
+         
+      <if test="departmentName != null">
+        department_name,
+      </if>
+         
+      <if test="scanTime != null">
+        scan_time,
+      </if>
+         </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+          <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+          <if test="faceId != null">
+        #{faceId,jdbcType=INTEGER},
+      </if>
+          <if test="departmentId != null">
+        #{departmentId,jdbcType=INTEGER},
+      </if>
+          <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+          <if test="number != null">
+        #{number,jdbcType=VARCHAR},
+      </if>
+          <if test="deviceId != null">
+        #{deviceId,jdbcType=VARCHAR},
+      </if>
+          <if test="deviceName != null">
+        #{deviceName,jdbcType=VARCHAR},
+      </if>
+          <if test="departmentName != null">
+        #{departmentName,jdbcType=VARCHAR},
+      </if>
+          <if test="scanTime != null">
+        #{scanTime,jdbcType=TIMESTAMP},
+      </if>
+        </trim>
+  </insert>
+  
+  <select id="countByExample" parameterType="com.springboot.core.model.auto.SysScanhistoryExample" resultType="java.lang.Long">
+    select count(*) from t_sys_scanhistory
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  <update id="updateByExampleSelective" parameterType="map">
+    update t_sys_scanhistory
+    <set>
+          <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+          <if test="record.faceId != null">
+        face_id = #{record.faceId,jdbcType=INTEGER},
+      </if>
+          <if test="record.departmentId != null">
+        department_id = #{record.departmentId,jdbcType=INTEGER},
+      </if>
+          <if test="record.name != null">
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+          <if test="record.number != null">
+        number = #{record.number,jdbcType=VARCHAR},
+      </if>
+          <if test="record.deviceId != null">
+        device_id = #{record.deviceId,jdbcType=VARCHAR},
+      </if>
+          <if test="record.deviceName != null">
+        device_name = #{record.deviceName,jdbcType=VARCHAR},
+      </if>
+          <if test="record.departmentName != null">
+        department_name = #{record.departmentName,jdbcType=VARCHAR},
+      </if>
+          <if test="record.scanTime != null">
+        scan_time = #{record.scanTime,jdbcType=TIMESTAMP},
+      </if>
+         
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  
+  <update id="updateByExample" parameterType="map">
+    update t_sys_scanhistory
+    set
+            	     	 
+    	 id = #{record.id,jdbcType=INTEGER},
+    	         	     	 
+    	 face_id = #{record.faceId,jdbcType=INTEGER},
+    	         	     	 
+    	 department_id = #{record.departmentId,jdbcType=INTEGER},
+    	         	     	 
+    	 name = #{record.name,jdbcType=VARCHAR},
+    	         	     	 
+    	 number = #{record.number,jdbcType=VARCHAR},
+    	         	     	 
+    	 device_id = #{record.deviceId,jdbcType=VARCHAR},
+    	         	     	 
+    	 device_name = #{record.deviceName,jdbcType=VARCHAR},
+    	         	     	 
+    	 department_name = #{record.departmentName,jdbcType=VARCHAR},
+    	         	     	 
+    	 scan_time = #{record.scanTime,jdbcType=TIMESTAMP}
+    	         
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  
+      <update id="updateByPrimaryKeySelective" parameterType="com.springboot.core.model.auto.SysScanhistory">
+    update t_sys_scanhistory
+    <set>
+                          
+      <if test="faceId != null">
+        face_id = #{faceId,jdbcType=INTEGER},
+      </if>
+                      
+      <if test="departmentId != null">
+        department_id = #{departmentId,jdbcType=INTEGER},
+      </if>
+                      
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+                      
+      <if test="number != null">
+        number = #{number,jdbcType=VARCHAR},
+      </if>
+                      
+      <if test="deviceId != null">
+        device_id = #{deviceId,jdbcType=VARCHAR},
+      </if>
+                      
+      <if test="deviceName != null">
+        device_name = #{deviceName,jdbcType=VARCHAR},
+      </if>
+                      
+      <if test="departmentName != null">
+        department_name = #{departmentName,jdbcType=VARCHAR},
+      </if>
+                      
+      <if test="scanTime != null">
+        scan_time = #{scanTime,jdbcType=TIMESTAMP},
+      </if>
+              </set>
+    
+    where 
+            
+    id = #{id,jdbcType=INTEGER}
+                                                                          
+  </update>
+
+      	      	   	      	   	      	   	      	   	      	   	      	   	      	   	      	   	      	
+
+  <update id="updateByPrimaryKey" parameterType="com.springboot.core.model.auto.SysScanhistory">
+    update t_sys_scanhistory
+    set 
+    		 		 	  	  
+		face_id = #{faceId,jdbcType=INTEGER},
+	  	 		 	  	  
+		department_id = #{departmentId,jdbcType=INTEGER},
+	  	 		 	  	  
+		name = #{name,jdbcType=VARCHAR},
+	  	 		 	  	  
+		number = #{number,jdbcType=VARCHAR},
+	  	 		 	  	  
+		device_id = #{deviceId,jdbcType=VARCHAR},
+	  	 		 	  	  
+		device_name = #{deviceName,jdbcType=VARCHAR},
+	  	 		 	  	  
+		department_name = #{departmentName,jdbcType=VARCHAR},
+	  	 		 	  		
+		scan_time = #{scanTime,jdbcType=TIMESTAMP}
+	  	 		
+    where 
+            
+    id = #{id,jdbcType=INTEGER}
+                                                                            
+  </update>
+  
+                                                 
+</mapper>
