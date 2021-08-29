@@ -57,6 +57,15 @@ public class CannanApi {
 	// 上传base64图片
 	public final static String API_SINGLEBASE64 = "upload/singleBase64";
 	
+	// 删除设备特征API
+	public final static String API_DELETEFACE = "api/6";
+	
+	// 更新设备时间API
+	public final static String API_UPDATETIME = "api/9";
+	
+	// 查询设备信息API
+	public final static String API_DEVICEINFO = "api/7";
+	
 	/**
 	 * 向嘉楠服务端发起请求
 	 * @param api api接口名称

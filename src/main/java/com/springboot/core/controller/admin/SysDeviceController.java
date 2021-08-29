@@ -96,7 +96,6 @@ public class SysDeviceController extends BaseController{
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		JSONObject responseEntity = cannanApi.sendRequest(CannanApi.API_ONLINE, paramsMap, CannanApi.REQUEST_TYPE_GET);
 
-		List<Long> totalDeviceIdList = new ArrayList<Long>();
 		List<SysDevice> deviceList = new ArrayList<SysDevice>();
 		
 		int startIndex = (tablepar.getPage() - 1) * tablepar.getLimit() + 1;
@@ -107,7 +106,6 @@ public class SysDeviceController extends BaseController{
 			if (diviceIdArray != null) {
 				int index = 0;
 				for (Long deviceId : diviceIdArray) {
-					totalDeviceIdList.add(deviceId);
 					index++;
 					if (index >= startIndex && index <= endIndex) {
 						SysDevice device = getDeviceById(String.valueOf(deviceId));
@@ -127,7 +125,7 @@ public class SysDeviceController extends BaseController{
 			}
 		}
 		
-		return pageTable(deviceList, totalDeviceIdList.size());
+		return pageTable(deviceList, deviceList.size());
 	}
 	
 	/**
@@ -200,6 +198,12 @@ public class SysDeviceController extends BaseController{
         	for (SysFace face : faceList) {
 	    		Map<String, Object> paramsMap = new HashMap<String, Object>();
 	        	paramsMap.put("did", deviceID);
+	        	paramsMap.put("p1", "2");
+	        	paramsMap.put("p2", face.getId());
+	        	
+        		// 先删除旧的特征数据
+	        	cannanApi.sendRequest(CannanApi.API_DELETEFACE, paramsMap, CannanApi.REQUEST_TYPE_POST);
+	        	
 	        	paramsMap.put("p1", face.getId());
 	        	paramsMap.put("p2", "1");
 	        	paramsMap.put("feature", face.getBase64());
@@ -231,6 +235,7 @@ public class SysDeviceController extends BaseController{
     	int recordLength = response.getJSONObject("resp").getIntValue("length");
     	if (recordLength > 0) {
 	    	JSONArray records = response.getJSONObject("resp").getJSONArray("data");
+	    	
 	    	for (int i = 0; i < records.size(); i++) {
 	    		JSONObject record = records.getJSONObject(i);
 	    		// 特征ID
@@ -257,7 +262,7 @@ public class SysDeviceController extends BaseController{
 	    		scanhistory.setDeviceName(device.getDeviceName());
 	    		scanhistory.setFaceId(Integer.parseInt(uid));
 	    		scanhistory.setNumber(face.getNumber());
-	    		scanhistory.setScanTime(new Date(scanTime));
+	    		scanhistory.setScanTime(new Date(scanTime * 1000));
 	    		sysScanhistoryService.insertSelective(scanhistory);
 	    	}
     	}

@@ -34,6 +34,10 @@
         </form>
     </div>
 </div>
+<script type="text/html" id="toolbar">
+  <div class="layui-btn-container">
+  </div>
+</script>
 <div class="layui-card">
     <div class="layui-card-body">
         <table id="sysScanhistory-table" lay-filter="sysScanhistory-table"></table>
@@ -65,10 +69,11 @@
             elem: '#sysScanhistory-table',
             url: MODULE_PATH + 'list',
             page: true,
+            toolbar: '#toolbar', 
+            defaultToolbar: ['filter', 'exports', 'print'],
             method: 'get',
             cols: cols,
-            skin: 'line',
-            defaultToolbar: []
+            skin: 'line'
         });
 
         //查询按钮绑定

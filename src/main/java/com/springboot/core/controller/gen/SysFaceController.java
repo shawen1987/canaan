@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.springboot.core.common.base.BaseController;
@@ -188,6 +189,11 @@ public class SysFaceController extends BaseController{
     public AjaxResult uploadFaceImg(@RequestParam(value = "file") MultipartFile file)
     {
 		try {
+			File imgFileDirFile = new File(FACEIMG_PATH);
+			if (!imgFileDirFile.exists()) {
+				imgFileDirFile.mkdirs();
+			}
+			
             File imgFile = new File(FACEIMG_PATH + "/" + file.getOriginalFilename());
             file.transferTo(imgFile);
             
@@ -195,6 +201,9 @@ public class SysFaceController extends BaseController{
         	paramsMap.put("path", FACEIMG_PATH + "/" + file.getOriginalFilename());
         	paramsMap.put("type", "1");
         	JSONObject response = cannanApi.sendRequest(CannanApi.API_EXTRACTLOCAL, paramsMap, CannanApi.REQUEST_TYPE_POST);
+        	if (StringUtils.isEmpty(response.getString("feature"))) {
+        		return retobject(-1, "生成base64格式的图片字符串失败，请选择宽高为300px*400px的图片。");
+        	}
 	        return retobject(0, response.getString("feature"));
 		} catch (IOException e) {
 			return retobject(-1, "上传图片失败，请联系管理员。");
